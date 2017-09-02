@@ -10,6 +10,7 @@ public class CellTerrain : MonoBehaviour {
     void Awake()
     {
         select = GameObject.Find("Select").transform;
+        posSelect = transform.GetChild(0).GetComponent<Transform>();
     }
     public void OnMouseEnter()
     {

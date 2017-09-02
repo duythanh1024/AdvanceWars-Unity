@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 public class Manager : MonoBehaviour {
+    CellTerrain[,] mapTerrain;
+    CellArmy[,] mapArmy;
     public enum Type
     {
         redTank,
