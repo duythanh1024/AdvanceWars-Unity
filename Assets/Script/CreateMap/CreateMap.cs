@@ -36,6 +36,7 @@ public class CreateMap : MonoBehaviour {
         wood,
         grass,
         bridge,
+        none
     }
    public Type currentType;
    StringBuilder builer;

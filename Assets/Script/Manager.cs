@@ -6,6 +6,8 @@ public class Manager : MonoBehaviour {
     public CellArmy[,] mapArmy;
     public enum Type
     {
+        none,
+
         redTank,
         redInfantry,
         redMech,
@@ -31,10 +33,6 @@ public class Manager : MonoBehaviour {
         mapTerrain = new CellTerrain[15, 10];
         mapArmy = new CellArmy[15, 10];
         int l = layerTerrainAndPhysic.childCount;
-        for (int i = 0; i < l; i++)
-        {
-
-        }
 	}
 	void Update () {
 		
