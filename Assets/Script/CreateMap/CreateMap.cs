@@ -1,4 +1,5 @@
-﻿using UnityEngine.UI;
+﻿using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using UnityEngine;
 using System.Text;
 public class CreateMap : MonoBehaviour {
@@ -64,7 +65,6 @@ public class CreateMap : MonoBehaviour {
         grass,
         bridge;
     #endregion
-
     //[HideInInspector]
     public int[] dataSaveMap_LayerArmy;
     public int[] dataSaveMap_LayerTerrain;
@@ -75,8 +75,8 @@ public class CreateMap : MonoBehaviour {
         dataSaveMap_LayerTerrain = new int[150];
         for (int i = 0; i < 150; i++)
         {
-            dataSaveMap_LayerTerrain[i] = 0;
-            dataSaveMap_LayerArmy[i] = 0;
+            dataSaveMap_LayerTerrain[i] = -1;
+            dataSaveMap_LayerArmy[i] = -1;
         }
     }
     public void SaveMap()
@@ -109,20 +109,20 @@ public class CreateMap : MonoBehaviour {
         {
             for (int i = 0; i < 150; i++)
             {
-                builer.Append(dataSaveMap_LayerArmy[i]);
-                builer.Append(",");
-            }
-            builer.AppendLine();
-            builer.Append("_");
-            for (int i = 0; i < 150; i++)
-            {
                 builer.Append(dataSaveMap_LayerTerrain[i]);
                 builer.Append(",");
             }
+            for (int i = 0; i < 150; i++)
+            {
+                builer.Append(dataSaveMap_LayerArmy[i]);
+                builer.Append(",");
+            }
+            builer.Remove(builer.Length-1, 1);
+            print(builer.ToString());
             System.IO.File.WriteAllText(Application.dataPath + @"\" + fileName.text, builer.ToString());
-            print(builer);
             notifi.color = Color.green;
             notifi.text = "Saved in " + Application.dataPath;
+            builer.Length = 0;
         }
     }
     public void OnChange()
@@ -131,5 +131,9 @@ public class CreateMap : MonoBehaviour {
         {
             notifi.text = "";
         }
+    }
+    public void Back()
+    {
+        SceneManager.LoadScene(0);
     }
 }
