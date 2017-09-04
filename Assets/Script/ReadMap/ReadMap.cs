@@ -53,9 +53,7 @@ public class ReadMap : MonoBehaviour {
             yield break;
         }
         line = reader.ReadLine();
-        print(line.Length);
         string[] txtCell = line.Split(',');
-        print(txtCell.Length);
         for (int i = 0; i < 150; i++)
         {
             InStance((CreateMap.Type)(Int32.Parse(txtCell[i])), i%15, i/15);
