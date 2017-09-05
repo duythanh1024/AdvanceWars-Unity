@@ -4,7 +4,7 @@ public class CellTerrain : MonoBehaviour {
     public Manager.Type type = Manager.Type.none;
     DisplayInfo displayInfo;
     public int def, capt;
-    public bool check;
+    public bool check, checkPath;
     [SerializeField]
     int x, y;
     private Transform posSelect;
@@ -24,10 +24,9 @@ public class CellTerrain : MonoBehaviour {
     void OnMouseEnter()
     {
         select.transform.position = posSelect.position;
-        manager.xSelect = x;
-        manager.ySelect = y;
         displayInfo.Reset();
         displayInfo.SetInfo(type, def, capt);
+        manager.DrawPath(x, y);
     }
    
   

@@ -110,17 +110,17 @@ public class CellArmy : MonoBehaviour {
     }
     void OnMouseEnter()
     {
-        manager.xSelect = x;
-        manager.ySelect = y;
         select.transform.position = posSelect.position;
         displayInfo.Reset();
         displayInfo.SetInfo(type, move, gas, hp, dame);
         displayInfo.SetInfo(manager.mapTerrain[x, y].type, manager.mapTerrain[x, y].def, manager.mapTerrain[x, y].capt);
+        manager.DrawPath(x, y);
     }
     void OnMouseDown()
     {
         manager.FindArea(type, move + 1, x, y);
-        manager.DrawPath();
+        manager.DrawArea();
+        manager.SetForDrawPath(x, y, move);
     }
     
     
