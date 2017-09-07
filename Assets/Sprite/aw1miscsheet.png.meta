@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 889d1fd971790b747a7e777e77119526
-timeCreated: 1504509110
+timeCreated: 1504726376
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -18,7 +18,7 @@ TextureImporter:
     21300022: aw1miscsheet_11
     21300024: city
     21300026: higthtLight
-    21300028: focus
+    21300028: selectFire
     21300030: 0
     21300032: 1
     21300034: 2
@@ -334,7 +334,7 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: focus
+      name: selectFire
       rect:
         serializedVersion: 2
         x: 97

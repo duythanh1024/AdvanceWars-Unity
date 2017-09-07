@@ -1,23 +1,24 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 public class CellArmy : MonoBehaviour {
     Manager manager;
     [SerializeField]
     Sprite one, two, three, four, five, six, seven, eight, nine, zero;
-    public int hp, move, gas, dame;
-    public Manager.Type type = Manager.Type.none;
-    [SerializeField]
     SpriteRenderer hp1, hp2;
-    DisplayInfo displayInfo;
+    public int hp, move, gas, dame;
+    public bool checkFire;
+    public Manager.Type type;// = Manager.Type.none;
     [SerializeField]
-    int x, y;
+    DisplayInfo displayInfo;
+    public int x, y;
     private Transform posSelect;
-    private Transform select;
     void Awake()
     {
         manager = GameObject.Find("Manager").GetComponent<Manager>();
         displayInfo = GameObject.Find("Manager").GetComponent<DisplayInfo>();
-        select = GameObject.Find("Select").transform;
         posSelect = transform.GetChild(0).GetComponent<Transform>();
+        hp1 = transform.GetChild(1).GetComponent<SpriteRenderer>();
+        hp2 = transform.GetChild(2).GetComponent<SpriteRenderer>();
         one = displayInfo.one;
         two = displayInfo.two;
         three = displayInfo.three;
@@ -29,10 +30,17 @@ public class CellArmy : MonoBehaviour {
         nine = displayInfo.nine;
         zero = displayInfo.zero;
     }
-    public void IntToSprite(Sprite spr1, Sprite spr2 = null)
+    public void UpdatePro(int _hp, int _gas)
     {
-        int a = hp % 10;
-        int b = a % 10;
+        hp = _hp;
+        gas = _gas;
+        IntToSprite(hp, hp1, hp2);
+    }
+    public void IntToSprite(int value, SpriteRenderer img1, SpriteRenderer img2 = null)
+    {
+        int b = (value / 10) % 10;
+        int a = value % 10;
+        Sprite spr1 = null;
         switch (a)
         {
             case 0:
@@ -66,9 +74,11 @@ public class CellArmy : MonoBehaviour {
                 spr1 = nine;
                 break;
         }
-        if (spr2!=null)
+        img1.sprite = spr1;
+        if (img2 != null)
         {
-            switch (a)
+            Sprite spr2 = null;
+            switch (b)
             {
                 case 0:
                     spr2 = zero;
@@ -101,6 +111,7 @@ public class CellArmy : MonoBehaviour {
                     spr2 = nine;
                     break;
             }
+            img2.sprite = spr2;
         }
     }
     public void Set(int _x, int _y)
@@ -110,17 +121,17 @@ public class CellArmy : MonoBehaviour {
     }
     void OnMouseEnter()
     {
-        select.transform.position = posSelect.position;
         displayInfo.Reset();
         displayInfo.SetInfo(type, move, gas, hp, dame);
         displayInfo.SetInfo(manager.mapTerrain[x, y].type, manager.mapTerrain[x, y].def, manager.mapTerrain[x, y].capt);
         manager.DrawPath(x, y);
+        manager.SetPosSelectIcon(posSelect.position.x, posSelect.position.y, checkFire);
     }
     void OnMouseDown()
     {
-        manager.FindArea(type, move + 1, x, y);
-        manager.DrawArea();
-        manager.SetForDrawPath(x, y, move);
+        manager.MoveArmyTo(x, y, type);        
+        manager.OnClickArmy(this);
+        manager.FireWith(this);
     }
     
     

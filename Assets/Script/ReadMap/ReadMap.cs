@@ -176,6 +176,10 @@ public class ReadMap : MonoBehaviour {
                 manager.mapTerrain[x, y].transform.position = new Vector3(x, y);
                 manager.mapTerrain[x, y].Set(x, y);
                 break;
+            default:
+                manager.mapArmy[x, y] = new CellArmy();
+                manager.mapArmy[x, y].type = Manager.Type.none;
+                break;
         }
     }
 	void Update () {
