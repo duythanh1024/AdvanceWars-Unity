@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 889d1fd971790b747a7e777e77119526
-timeCreated: 1504726376
+timeCreated: 1505637716
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -16,7 +16,7 @@ TextureImporter:
     21300018: moutain
     21300020: aw1miscsheet_10
     21300022: aw1miscsheet_11
-    21300024: city
+    21300024: city0
     21300026: higthtLight
     21300028: selectFire
     21300030: 0
@@ -31,8 +31,8 @@ TextureImporter:
     21300048: 9
     21300050: Rinfantry
     21300052: BInfantry
-    21300054: RedCity
-    21300056: B_hq
+    21300054: RedCity0
+    21300056: B_hq0
     21300058: aw1miscsheet_1
     21300060: R_hq
     21300062: street_up
@@ -45,9 +45,9 @@ TextureImporter:
     21300076: B_tank
     21300078: R_tank
     21300080: wood
-    21300082: blueCity
+    21300082: blueCity0
     21300084: sprInfo
-    21300086: HQ_Red
+    21300086: HQ_Red0
     21300088: HQ_Blue
     21300090: iconHp
     21300092: valueMove
@@ -70,6 +70,18 @@ TextureImporter:
     21300126: capt
     21300128: RedSelect
     21300130: BlueSelect
+    21300132: city1
+    21300134: B_hq1
+    21300136: RedCity1
+    21300138: HQ_Red1
+    21300140: turnRed
+    21300142: turnBlue
+    21300144: blueCity1
+    21300146: day
+    21300148: fire0
+    21300150: fire1
+    21300152: fire2
+    21300154: CellIM
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -308,7 +320,7 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: city
+      name: city0
       rect:
         serializedVersion: 2
         x: 371
@@ -503,26 +515,26 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: RedCity
+      name: RedCity0
       rect:
         serializedVersion: 2
         x: 200
         y: 70
-        width: 30
-        height: 47
+        width: 31
+        height: 48
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: B_hq
+      name: B_hq0
       rect:
         serializedVersion: 2
         x: 234
         y: 121
         width: 32
-        height: 64
+        height: 63
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -685,7 +697,7 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: blueCity
+      name: blueCity0
       rect:
         serializedVersion: 2
         x: 235
@@ -711,7 +723,7 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: HQ_Red
+      name: HQ_Red0
       rect:
         serializedVersion: 2
         x: 0
@@ -1006,6 +1018,97 @@ TextureImporter:
         height: 15
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: turnRed
+      rect:
+        serializedVersion: 2
+        x: 644
+        y: 44
+        width: 101
+        height: 24
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: turnBlue
+      rect:
+        serializedVersion: 2
+        x: 644
+        y: 22
+        width: 101
+        height: 24
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: day
+      rect:
+        serializedVersion: 2
+        x: 757
+        y: 152
+        width: 94
+        height: 29
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: fire0
+      rect:
+        serializedVersion: 2
+        x: 596
+        y: 501
+        width: 31
+        height: 34
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: fire1
+      rect:
+        serializedVersion: 2
+        x: 594
+        y: 539
+        width: 29
+        height: 30
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: fire2
+      rect:
+        serializedVersion: 2
+        x: 593
+        y: 571
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: CellIM
+      rect:
+        serializedVersion: 2
+        x: 735
+        y: 71
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
