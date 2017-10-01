@@ -1,0 +1,26 @@
+Initialize engine version: 5.6.0f3 (497a0f351392)
+GfxDevice: creating device client; threaded=1
+d3d11: D3D_FEATURE_LEVEL_11_1 not-recognized (only 11.0 runtime installed?)
+Direct3D:
+    Version:  Direct3D 11.0 [level 11.0]
+    Renderer: NVIDIA GeForce 820M (ID=0x1140)
+    Vendor:   NVIDIA
+    VRAM:     978 MB
+    Driver:   10.18.13.6881
+Begin MonoManager ReloadAssembly
+Platform assembly: D:\Project\Unity\Advanced War\Build\create map_Data\Managed\UnityEngine.dll (this message is harmless)
+Loading D:\Project\Unity\Advanced War\Build\create map_Data\Managed\UnityEngine.dll into Unity Child Domain
+Platform assembly: D:\Project\Unity\Advanced War\Build\create map_Data\Managed\Assembly-CSharp.dll (this message is harmless)
+Loading D:\Project\Unity\Advanced War\Build\create map_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
+Platform assembly: D:\Project\Unity\Advanced War\Build\create map_Data\Managed\UnityEngine.UI.dll (this message is harmless)
+Loading D:\Project\Unity\Advanced War\Build\create map_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
+Platform assembly: D:\Project\Unity\Advanced War\Build\create map_Data\Managed\UnityEngine.Networking.dll (this message is harmless)
+Loading D:\Project\Unity\Advanced War\Build\create map_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
+Platform assembly: D:\Project\Unity\Advanced War\Build\create map_Data\Managed\UnityEngine.Analytics.dll (this message is harmless)
+Loading D:\Project\Unity\Advanced War\Build\create map_Data\Managed\UnityEngine.Analytics.dll into Unity Child Domain
+- Completed reload, in  0.163 seconds
+Platform assembly: D:\Project\Unity\Advanced War\Build\create map_Data\Managed\System.Core.dll (this message is harmless)
+Platform assembly: D:\Project\Unity\Advanced War\Build\create map_Data\Managed\System.dll (this message is harmless)
+desktop: 1366x768 60Hz; virtual: 1366x768 at 0,0
+<RI> Initializing input.
+<RI> Input initialized.
