@@ -1,24 +1,171 @@
-﻿using System.Collections;
+﻿using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
+using System;
+using System.Text;
+public class ArmyForAI{
+    public CellArmy_ army;
+    public int x, y;
+    public ArmyForAI(CellArmy_ army, int x, int y)
+    {
+        this.army = army;
+        this.x = x;
+        this.y = y;
+    }
+}
+
 public class LayerArmy_ : MonoBehaviour {
+    public enum TeamType
+    {
+        Red,
+        Blue
+    }
     public bool r_Moved, b_Moved;
     private LayerPath_ refLayerPath;
-    private LayerIM refLayerIM;
     private CellArmy_[,] layerArmy;
+    //AI
+    TeamType teamType;
+    private List<ArmyForAI> listArmy;
+    LayerIM refLayerIM;
+    AI_Training refTraining;
+    AI_DataRow refDataRows;
+    List<ArmyForAI> listEnemyCanFire;
+    //UI
+    UserInterface refUserInterface;
+
     Manager_ manager;
     [SerializeField]
     SpriteRenderer sprFire;
     [SerializeField]
     Sprite[] fire;
-    void Update()
+   
+    public void DestroyArmy()
     {
-        if (Input.GetKeyDown("b"))
+        layerArmy = new CellArmy_[15, 10];
+        listArmy = new List<ArmyForAI>();
+        r_Moved = false;
+        b_Moved = false;
+        for (int i = 0; i < transform.childCount; i++)
         {
-            StartCoroutine(AnimFire(1,1));
-            
+            Destroy(transform.GetChild(i).gameObject);
+        }
+        
+    }
+    public void MyAwake()
+    {
+        layerArmy = new CellArmy_[15, 10];
+        manager = GameObject.Find("Manager").GetComponent<Manager_>();
+        refLayerPath = GameObject.Find("LayerPath").GetComponent<LayerPath_>();
+        refLayerIM = GameObject.Find("LayerIM").GetComponent<LayerIM>();
+        refTraining = GameObject.Find("AI_Traning").GetComponent<AI_Training>();
+        refDataRows = GameObject.Find("AI_Traning").GetComponent<AI_DataRow>();
+        refUserInterface = GameObject.Find("CanvasMain").GetComponent<UserInterface>();
+        listArmy = new List<ArmyForAI>();
+        if (refUserInterface.recordeStep.isOn)
+        {
+            refDataRows.CreateNew();
         }
     }
-    public void AddValueIM_Blue(Manager_.TypeArmy type = Manager_.TypeArmy.none)
+    //void Update()
+    //{
+    //    //test
+    //    //if (Input.GetKeyDown("b"))
+    //    //{
+    //    //    StartCoroutine(AnimFire(1,1));
+            
+    //    //}
+    //}
+    public List<ArmyForAI> GetListArmy(TeamType type)
+    {
+        ArmyForAI army;
+        listArmy.Clear();
+        for (int c = 0; c < 10; c++)
+        {
+            for (int r = 0; r < 15; r++)
+            {
+                if (!IsNull(r, c))
+                {
+                    Manager_.TypeArmy t = layerArmy[r, c].type;
+                    if (type == TeamType.Blue)
+                    {
+                        if (t == Manager_.TypeArmy.blueInfantry || t == Manager_.TypeArmy.blueMech || t == Manager_.TypeArmy.blueTank)
+                        {
+                            army = new ArmyForAI(layerArmy[r, c], r, c);
+                            listArmy.Add(army);
+                        }
+                    }
+                    else
+                    {
+                        if (t == Manager_.TypeArmy.redInfantry || t == Manager_.TypeArmy.redMech || t == Manager_.TypeArmy.redTank)
+                        {
+                            army = new ArmyForAI(layerArmy[r, c], r, c);
+                            listArmy.Add(army);
+                        }
+                    }
+                }
+            }
+        }
+        return listArmy;
+    }
+    public List<ArmyForAI> GetListCanFire()
+    {
+        return listEnemyCanFire;
+    }
+    public int[] AI_GetUnitBlueMaxHp()
+    {
+        int[] pos2dUnitBlueMaxHp = new int[2];
+        int maxHp = -1;
+        for (int c = 0; c < 10; c++)
+        {
+            for (int r = 0; r < 15; r++)
+            {
+                if (!IsNull(r, c))
+                {
+                    if (layerArmy[r, c].isMoved)
+                        continue;
+                   Manager_.TypeArmy t = layerArmy[r, c].type;
+                    if (t == Manager_.TypeArmy.blueInfantry || t == Manager_.TypeArmy.blueMech || t == Manager_.TypeArmy.blueTank)
+                    {
+                        if (layerArmy[r, c].hp > maxHp)
+                        {
+                            maxHp = layerArmy[r, c].hp;
+                            pos2dUnitBlueMaxHp[0] = r;
+                            pos2dUnitBlueMaxHp[1] = c;
+                        }
+                    }
+                }
+            }
+        }
+        return pos2dUnitBlueMaxHp;
+    }
+    public void AddValueToInluenceMap2(Manager_.TypeArmy currentType)
+    {
+        if (currentType == Manager_.TypeArmy.redTank || currentType == Manager_.TypeArmy.redMech || currentType == Manager_.TypeArmy.redInfantry)
+        {
+            AddValueIM_Red2();
+            AddValueIM_Blue2(currentType);
+        }
+        else
+        {
+            AddValueIM_Red2(currentType);
+            AddValueIM_Blue2();
+        }
+    }
+    public void AddValueToInluenceMap(Manager_.TypeArmy currentType)
+    {
+        if (currentType == Manager_.TypeArmy.redTank || currentType == Manager_.TypeArmy.redMech || currentType == Manager_.TypeArmy.redInfantry)
+        {
+            AddValueIM_Red();
+            AddValueIM_Blue2(currentType);
+        }
+        else
+        {
+            AddValueIM_Red2(currentType);
+            AddValueIM_Blue();
+        }
+    }
+    
+    public void AddValueIM_Blue(Manager_.TypeArmy typeEnemy = Manager_.TypeArmy.none)
     {
         for (int c = 0; c < 10; c++)
         {
@@ -36,23 +183,98 @@ public class LayerArmy_ : MonoBehaviour {
                             {
                                 if (refLayerPath.IsCheck(rr, cc))
                                 {
-                                    if (type != Manager_.TypeArmy.none)
+                                    if (typeEnemy != Manager_.TypeArmy.none)
                                     {
-                                        manager.refIM.SetBlue(rr, cc, layerArmy[r, c].GetDame(type));
+                                        manager.refIM.SetBlue(manager.onMove, rr, cc, layerArmy[r, c].GetDame(typeEnemy) + layerArmy[r, c].hp);
                                     }
                                     else
                                     {
-                                        manager.refIM.SetBlue(rr, cc, 2);
+                                        manager.refIM.SetBlue(manager.onMove, rr, cc, (2 + layerArmy[r, c].hp));
                                     }
                                 }
                             }
                         }
-                        refLayerPath.ClearAreaCheck();
+                        refLayerPath.ResetNull();
                     }
                 }
             }
         }
     }
+
+    //2
+    public void AddValueIM_Blue2(Manager_.TypeArmy typeEnemy = Manager_.TypeArmy.none)
+    {
+        for (int c = 0; c < 10; c++)
+        {
+            for (int r = 0; r < 15; r++)
+            {
+                if (!IsNull(r, c))
+                {
+                    Manager_.TypeArmy t = layerArmy[r, c].type;
+                    if (t == Manager_.TypeArmy.blueInfantry || t == Manager_.TypeArmy.blueMech || t == Manager_.TypeArmy.blueTank)
+                    {
+                        refLayerPath.FindArea(t, layerArmy[r, c].move, r, c);
+                        for (int cc = 0; cc < 10; cc++)
+                        {
+                            for (int rr = 0; rr < 15; rr++)
+                            {
+                                if (refLayerPath.IsCheck(rr, cc))
+                                {
+                                    if (typeEnemy != Manager_.TypeArmy.none)
+                                    {
+                                        manager.refIM.SetBlue(manager.onMove, rr, cc, layerArmy[r, c].GetDame(typeEnemy) + layerArmy[r, c].hp);
+                                    }
+                                    else
+                                    {
+                                        manager.refIM.SetBlue(manager.onMove, rr, cc, (2 + layerArmy[r, c].hp));
+                                    }
+                                }
+                            }
+                        }
+                        //refLayerPath.ResetNull();
+                    }
+                }
+            }
+        }
+    }
+    //2
+    public void AddValueIM_Red2(Manager_.TypeArmy type = Manager_.TypeArmy.none)
+    {
+        for (int c = 0; c < 10; c++)
+        {
+            for (int r = 0; r < 15; r++)
+            {
+                if (!IsNull(r, c))
+                {
+                    Manager_.TypeArmy t = layerArmy[r, c].type;
+                    if (t == Manager_.TypeArmy.redInfantry || t == Manager_.TypeArmy.redMech || t == Manager_.TypeArmy.redTank)
+                    {
+                        refLayerPath.FindArea(t, layerArmy[r, c].move, r, c);
+                        for (int cc = 0; cc < 10; cc++)
+                        {
+                            for (int rr = 0; rr < 15; rr++)
+                            {
+                                if (refLayerPath.IsCheck(rr, cc))
+                                {
+                                    if (type != Manager_.TypeArmy.none)
+                                    {
+                                        manager.refIM.SetRed(manager.onMove, rr, cc, layerArmy[r, c].GetDame(type) + layerArmy[r, c].hp);
+                                    }
+                                    else
+                                    {
+                                        manager.refIM.SetRed(manager.onMove, rr, cc, (2 + layerArmy[r, c].hp));
+                                    }
+                                }
+                            }
+                        }
+                        //refLayerPath.ResetNull();
+                    }
+                }
+            }
+        }
+
+    }
+
     public void AddValueIM_Red(Manager_.TypeArmy type = Manager_.TypeArmy.none)
     {
         for (int c = 0; c < 10; c++)
@@ -73,16 +295,16 @@ public class LayerArmy_ : MonoBehaviour {
                                 {
                                     if (type != Manager_.TypeArmy.none)
                                     {
-                                        manager.refIM.SetRed(rr, cc, layerArmy[r, c].GetDame(type));
+                                        manager.refIM.SetRed(manager.onMove, rr, cc, layerArmy[r, c].GetDame(type) + layerArmy[r, c].hp);
                                     }
                                     else
                                     {
-                                        manager.refIM.SetRed(rr, cc, 2);
+                                        manager.refIM.SetRed(manager.onMove, rr, cc, (2 + layerArmy[r, c].hp));
                                     }
                                 }
                             }
                         }
-                        refLayerPath.ClearAreaCheck();
+                        refLayerPath.ResetNull();
                     }
 	            }
             }
@@ -112,7 +334,8 @@ public class LayerArmy_ : MonoBehaviour {
         sprFire.gameObject.SetActive(true);
         sprFire.sprite = fire[0];
         int i = 1;
-        float t = Time.time + .1f;
+        float delay = refUserInterface.speedUp == 1 ? .1f : (refUserInterface.speedUp == 5 ? .05f : .01f);
+        float t = Time.time + delay;
         while (true)
         {
             if (t < Time.time)
@@ -125,17 +348,12 @@ public class LayerArmy_ : MonoBehaviour {
                 }
                 sprFire.sprite = fire[i];
                 i++;
-                t = Time.time + .1f;
+                t = Time.time + delay;
             }
             yield return null;
         }
     }
-    void Awake()
-    {
-        layerArmy = new CellArmy_[15, 10];
-        manager = GameObject.Find("Manager").GetComponent<Manager_>();
-        refLayerPath = GameObject.Find("LayerPath").GetComponent<LayerPath_>();
-    }
+   
     /// <summary>
     /// return 0 -> not win; 
     /// return -1 -> red win; 
@@ -153,14 +371,16 @@ public class LayerArmy_ : MonoBehaviour {
                     if (layerArmy[r, c].type == Manager_.TypeArmy.redInfantry || layerArmy[r, c].type == Manager_.TypeArmy.redMech || layerArmy[r, c].type == Manager_.TypeArmy.redTank)
                         numRed++;
                     else
+                    {
                         if (layerArmy[r, c].type == Manager_.TypeArmy.blueInfantry || layerArmy[r, c].type == Manager_.TypeArmy.blueMech || layerArmy[r, c].type == Manager_.TypeArmy.blueTank)
-                        numBlue++;
+                            numBlue++;
+                    }
             }
         }
         if (numRed == 0)
-            return -1;
-        if (numBlue == 0)
             return 1;
+        if (numBlue == 0)
+            return -1;
         return 0;
     }
     public bool IsFire(int x, int y)
@@ -170,7 +390,9 @@ public class LayerArmy_ : MonoBehaviour {
     public bool Select(Manager_.OnMove onMove)
     {
         bool success = false;
-        Manager_.savedArmy = layerArmy[Manager_.savedX, Manager_.savedY];//print(layerArmy[Manager_.savedX, Manager_.savedY].name);
+        if (IsNull(Manager_.selectedX, Manager_.selectedY))
+            return false;
+        Manager_.savedArmy = layerArmy[Manager_.selectedX, Manager_.selectedY];// print(layerArmy[Manager_.selectedX, Manager_.selectedY].name);
         if (Manager_.savedArmy != null && !Manager_.savedArmy.isMoved)
         {
             Manager_.TypeArmy t = Manager_.savedArmy.type;
@@ -182,7 +404,7 @@ public class LayerArmy_ : MonoBehaviour {
             else//onmove blue
                 if (t == Manager_.TypeArmy.redInfantry || t == Manager_.TypeArmy.redMech || t == Manager_.TypeArmy.redTank)
                     return false;
-            refLayerPath.DrawArea();
+            //refLayerPath.DrawArea();
             success = true;
         }
         return success;
@@ -235,9 +457,13 @@ public class LayerArmy_ : MonoBehaviour {
     {
         return layerArmy[x, y].type;
     }
+    public int GetHp(int x, int y)
+    {
+        return layerArmy[x, y].hp;
+    }
     public void ConfirmPosition()
     {
-        if (Manager_.newX == Manager_.savedX && Manager_.newY == Manager_.savedY)
+        if (Manager_.newX == Manager_.selectedX && Manager_.newY == Manager_.selectedY)
         {
             layerArmy[Manager_.newX, Manager_.newY].Moved();
         }
@@ -245,48 +471,50 @@ public class LayerArmy_ : MonoBehaviour {
         {
             layerArmy[Manager_.newX, Manager_.newY] = Manager_.savedArmy;
             layerArmy[Manager_.newX, Manager_.newY].Moved();
-            layerArmy[Manager_.savedX, Manager_.savedY] = null;
+            layerArmy[Manager_.selectedX, Manager_.selectedY] = null;
         }
     }
     public void Capt()
     {
-        layerArmy[Manager_.newX, Manager_.newY].Capt();
+        float speed = refUserInterface.speedUp == 1 ? 1 : (refUserInterface.speedUp == 5 ? 3 : 10);
+        layerArmy[Manager_.newX, Manager_.newY].Capt(speed);
         StartCoroutine(WaitCapt());
     }
     private IEnumerator WaitCapt()
     {
-        yield return new WaitForSeconds(1f);
+        float time = Manager_.savedArmy.transform.GetChild(0).GetComponent<Animation>().GetClip("Capt").length / Manager_.savedArmy.transform.GetChild(0).GetComponent<Animation>()["Capt"].speed;
+        yield return new WaitForSeconds(time);
         manager.FeedBack();
     }
     public void Wait()
     {
         manager.FeedBack();
     }
-    public bool Fire(int xFoscus, int yFocus, int defFocus, int defCurrent)
+    public bool Fire(int xEnemy, int yEnemy, int defEnemy, int defCurrent)
     {
         bool isDie = false;
         bool wait = false;
-        layerArmy[xFoscus, yFocus].checkFire = false;
+        layerArmy[xEnemy, yEnemy].checkFire = false;
         Manager_.savedArmy.checkFire = false;
-        if (!layerArmy[xFoscus, yFocus].UpdateHp(Random.Range(0, 2) + layerArmy[xFoscus, yFocus].hp - (Manager_.savedArmy.GetDame(layerArmy[xFoscus, yFocus].type) - defFocus)))
+        if (!layerArmy[xEnemy, yEnemy].UpdateHp(UnityEngine.Random.Range(0, 2) + layerArmy[xEnemy, yEnemy].hp - (Manager_.savedArmy.GetDame(layerArmy[xEnemy, yEnemy].type) - defEnemy)))
         {
-            StartCoroutine(AnimFire(xFoscus, yFocus));
+            StartCoroutine(AnimFire(xEnemy, yEnemy));
             isDie = true;
             wait = true;
         }
         if (!wait)
         {
-            if (!Manager_.savedArmy.UpdateHp(Random.Range(0, 2) + Manager_.savedArmy.hp - (layerArmy[xFoscus, yFocus].GetDame(Manager_.savedArmy.type) - defCurrent)))
+            if (!Manager_.savedArmy.UpdateHp(UnityEngine.Random.Range(0, 2) + Manager_.savedArmy.hp - (layerArmy[xEnemy, yEnemy].GetDame(Manager_.savedArmy.type) - defCurrent)))
             {
-                StartCoroutine(AnimFire(Manager_.savedX, Manager_.savedY));
+                StartCoroutine(AnimFire(Manager_.selectedX, Manager_.selectedY));
                 isDie = true;
             }
         }
         else
         {
-            if (!Manager_.savedArmy.UpdateHp(Random.Range(0, 2) + Manager_.savedArmy.hp - (layerArmy[xFoscus, yFocus].GetDame(Manager_.savedArmy.type) - defCurrent)))
+            if (!Manager_.savedArmy.UpdateHp(UnityEngine.Random.Range(0, 2) + Manager_.savedArmy.hp - (layerArmy[xEnemy, yEnemy].GetDame(Manager_.savedArmy.type) - defCurrent)))
             {
-                StartCoroutine(AnimFire(Manager_.savedX, Manager_.savedY, true));
+                StartCoroutine(AnimFire(Manager_.selectedX, Manager_.selectedY, true));
                 isDie = true;
             }
         }
@@ -294,40 +522,158 @@ public class LayerArmy_ : MonoBehaviour {
     }
     public void Cancel()
     {
-        Manager_.savedArmy.transform.position = new Vector2(Manager_.savedX, Manager_.savedY);
+        Manager_.savedArmy.transform.position = new Vector2(Manager_.selectedX, Manager_.selectedY);
     }
-    public bool CanMove()
+    public void AnimMove(bool isAnim = true)
     {
         if (refLayerPath.listArmyMove.Count == 1)//not move
         {
-            manager.FeedBack();
-            return false;
+            //manager.FeedBack();
+            MoveWithoutAnim();// print("@");
+
+            return;
         }
-        if (refLayerPath.listArmyMove.Count != 0)//cannot move
+        if (refLayerPath.listArmyMove.Count != 0)//move
         {
-            StartCoroutine(AnimMove());
-            return true;
+            if (isAnim)
+            {
+                StartCoroutine(MoveWithAnim());
+            }
+            else
+            {
+
+                MoveWithoutAnim();
+                //return false;
+            }
         }
-        return false;
-        
     }
-    IEnumerator AnimMove()
+    public string GetDataRowCurrent(int xCenter, int yCenter, int xStat, int yStart)
     {
+        manager.SetInluenceMapForWriteFile2();
+        StringBuilder builder = new StringBuilder();
+        float[] influenceMap = refLayerIM.GetIM5x5(xCenter, yCenter);
+        for (int i = 0; i < 25; i++)
+        {
+            builder.Append(influenceMap[i]);
+            builder.Append(",");
+        }
+        builder.Append(GetHp(Manager_.selectedX, Manager_.selectedY));
+        builder.Append(",");
+        builder.Append(15 * xCenter + yCenter);//end
+        builder.Append(",");
+        builder.Append(15 * xStat + yStart);//start
+        builder.Append(",");
+        switch (GetType(Manager_.selectedX, Manager_.selectedY))
+        {
+            case Manager_.TypeArmy.redTank:
+            case Manager_.TypeArmy.blueTank:
+                builder.Append(0);
+                break;
+            case Manager_.TypeArmy.redInfantry:
+            case Manager_.TypeArmy.blueInfantry:
+                builder.Append(1);
+                break;
+            case Manager_.TypeArmy.redMech:
+            case Manager_.TypeArmy.blueMech:
+                builder.Append(2);
+                break;
+        }
+        //print(builder.ToString());
+        return builder.ToString();
+
+    }
+    private void MoveWithoutAnim()
+    {
+        
+        //AI:
+        if (refUserInterface.recordeStep.isOn)
+        {
+            manager.SetInluenceMapForWriteFile();
+            List<Position2D> listPosArea = refLayerPath.GetListArea(GetType(Manager_.selectedX, Manager_.selectedY), Manager_.savedArmy.move, Manager_.selectedX, Manager_.selectedY);
+            int t_newX = (int)refLayerPath.listArmyMove[refLayerPath.listArmyMove.Count - 1].x;
+            int t_newY = (int)refLayerPath.listArmyMove[refLayerPath.listArmyMove.Count - 1].y;
+            if (manager.onMove == Manager_.OnMove.Red)
+            {
+                for (int i = 0; i < listPosArea.Count; i++)
+                {
+                    float[] t = refLayerIM.GetIM5x5(listPosArea[i].x, listPosArea[i].y);
+                    if (listPosArea[i].x == t_newX && listPosArea[i].y == t_newY)
+                        refDataRows.AddDataRow(true, GetType(Manager_.selectedX, Manager_.selectedY), t, GetHp(Manager_.selectedX, Manager_.selectedY), 15 * t_newY +t_newX, 15 * Manager_.selectedX + Manager_.selectedY, true);
+                    else
+                        refDataRows.AddDataRow(true, GetType(Manager_.selectedX, Manager_.selectedY), t, GetHp(Manager_.selectedX, Manager_.selectedY), 15 * t_newY + t_newX, 15 * Manager_.selectedX + Manager_.selectedY, false);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < listPosArea.Count; i++)
+                {
+                    float[] t = refLayerIM.GetIM5x5(listPosArea[i].x, listPosArea[i].y);
+                    if (listPosArea[i].x == t_newX && listPosArea[i].y == t_newY)
+                        refDataRows.AddDataRow(false, GetType(Manager_.selectedX, Manager_.selectedY), t, GetHp(Manager_.selectedX, Manager_.selectedY), 15 * t_newY + t_newX, 15 * Manager_.selectedX + Manager_.selectedY, true);
+                    else
+                        refDataRows.AddDataRow(false, GetType(Manager_.selectedX, Manager_.selectedY), t, GetHp(Manager_.selectedX, Manager_.selectedY), 15 * t_newY + t_newX, 15 * Manager_.selectedX + Manager_.selectedY, false);
+                }
+            } 
+        }
+        //move
+        Manager_.savedArmy.transform.position = refLayerPath.listArmyMove[refLayerPath.listArmyMove.Count - 1];//move now
+        Manager_.newX = (int)refLayerPath.listArmyMove[refLayerPath.listArmyMove.Count - 1].x;
+        Manager_.newY = (int)refLayerPath.listArmyMove[refLayerPath.listArmyMove.Count - 1].y;
+        manager.FeedBack();
+    }
+    IEnumerator MoveWithAnim()
+    {
+
+        //AI:
+        if (refUserInterface.recordeStep.isOn)
+        {
+            manager.SetInluenceMapForWriteFile();
+            List<Position2D> listPosArea = refLayerPath.GetListArea(GetType(Manager_.selectedX, Manager_.selectedY), Manager_.savedArmy.move, Manager_.selectedX, Manager_.selectedY);
+            int t_newX = (int)refLayerPath.listArmyMove[refLayerPath.listArmyMove.Count - 1].x;
+            int t_newY = (int)refLayerPath.listArmyMove[refLayerPath.listArmyMove.Count - 1].y;
+            if (manager.onMove == Manager_.OnMove.Red)
+            {
+                for (int i = 0; i < listPosArea.Count; i++)
+                {
+                    float[] t = refLayerIM.GetIM5x5(listPosArea[i].x, listPosArea[i].y);
+                    if (listPosArea[i].x == t_newX && listPosArea[i].y == t_newY)
+                        refDataRows.AddDataRow(true, GetType(Manager_.selectedX, Manager_.selectedY), t, GetHp(Manager_.selectedX, Manager_.selectedY), 15 * t_newY + t_newX, 15 * Manager_.selectedX + Manager_.selectedY, true);
+                    else
+                        refDataRows.AddDataRow(true, GetType(Manager_.selectedX, Manager_.selectedY), t, GetHp(Manager_.selectedX, Manager_.selectedY), 15 * t_newY + t_newX, 15 * Manager_.selectedX + Manager_.selectedY, false);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < listPosArea.Count; i++)
+                {
+                    float[] t = refLayerIM.GetIM5x5(listPosArea[i].x, listPosArea[i].y);
+                    if (listPosArea[i].x == t_newX && listPosArea[i].y == t_newY)
+                        refDataRows.AddDataRow(false, GetType(Manager_.selectedX, Manager_.selectedY), t, GetHp(Manager_.selectedX, Manager_.selectedY), 15 * t_newY + t_newX, 15 * Manager_.selectedX + Manager_.selectedY, true);
+                    else
+                        refDataRows.AddDataRow(false, GetType(Manager_.selectedX, Manager_.selectedY), t, GetHp(Manager_.selectedX, Manager_.selectedY), 15 * t_newY + t_newX, 15 * Manager_.selectedX + Manager_.selectedY, false);
+                }
+            }
+        }
+        //move:
+        float delta = refUserInterface.speedUp == 1 ? .15f : (refUserInterface.speedUp == 5 ? .2f : .5f);
         for (int i = 0; i < refLayerPath.listArmyMove.Count; i++)
         {
             Vector2 to = refLayerPath.listArmyMove[i];
             while (Vector2.Distance(to, Manager_.savedArmy.transform.position) > 0)
             {
-                Manager_.savedArmy.transform.position = Vector2.MoveTowards(Manager_.savedArmy.transform.position, to, .1f);
+                Manager_.savedArmy.transform.position = Vector2.MoveTowards(Manager_.savedArmy.transform.position, to, delta);
                 yield return null;
             }
         }
         Manager_.newX = (int)refLayerPath.listArmyMove[refLayerPath.listArmyMove.Count - 1].x;
         Manager_.newY = (int)refLayerPath.listArmyMove[refLayerPath.listArmyMove.Count - 1].y;
+       
         manager.FeedBack();
     }
     public bool CheckFire(Manager_.OnMove oM)
     {
+        if (refUserInterface.comVsCom.isOn || refUserInterface.pVsCom.isOn)
+            listEnemyCanFire = new List<ArmyForAI>();
         bool isFire = false;
         int x, y;
         x = Manager_.newX - 1; y = Manager_.newY;//left
@@ -343,6 +689,11 @@ public class LayerArmy_ : MonoBehaviour {
                     {
                         layerArmy[x, y].checkFire = true;
                         isFire = true;
+                        if (refUserInterface.comVsCom.isOn || refUserInterface.pVsCom.isOn)
+                        {
+                            ArmyForAI a = new ArmyForAI(layerArmy[x, y], x, y);
+                            listEnemyCanFire.Add(a);
+                        }
                     }
                 }
                 else//red
@@ -350,6 +701,11 @@ public class LayerArmy_ : MonoBehaviour {
                     if (t == Manager_.TypeArmy.blueInfantry || t == Manager_.TypeArmy.blueMech || t == Manager_.TypeArmy.blueTank)
                     {
                         layerArmy[x, y].checkFire = true;
+                        if (refUserInterface.comVsCom.isOn || refUserInterface.pVsCom.isOn)
+                        {
+                            ArmyForAI a = new ArmyForAI(layerArmy[x, y], x, y);
+                            listEnemyCanFire.Add(a);
+                        }
                         isFire = true;
                     }
                 }
@@ -366,6 +722,11 @@ public class LayerArmy_ : MonoBehaviour {
                     if (t == Manager_.TypeArmy.redInfantry || t == Manager_.TypeArmy.redMech || t == Manager_.TypeArmy.redTank)
                     {
                         layerArmy[x, y].checkFire = true;
+                        if (refUserInterface.comVsCom.isOn || refUserInterface.pVsCom.isOn)
+                        {
+                            ArmyForAI a = new ArmyForAI(layerArmy[x, y], x, y);
+                            listEnemyCanFire.Add(a);
+                        }
                         isFire = true;
                     }
                 }
@@ -374,6 +735,11 @@ public class LayerArmy_ : MonoBehaviour {
                     if (t == Manager_.TypeArmy.blueInfantry || t == Manager_.TypeArmy.blueMech || t == Manager_.TypeArmy.blueTank)
                     {
                         layerArmy[x, y].checkFire = true;
+                        if (refUserInterface.comVsCom.isOn || refUserInterface.pVsCom.isOn)
+                        {
+                            ArmyForAI a = new ArmyForAI(layerArmy[x, y], x, y);
+                            listEnemyCanFire.Add(a);
+                        }
                         isFire = true;
                     }
                 }
@@ -391,6 +757,11 @@ public class LayerArmy_ : MonoBehaviour {
                     if (t == Manager_.TypeArmy.redInfantry || t == Manager_.TypeArmy.redMech || t == Manager_.TypeArmy.redTank)
                     {
                         layerArmy[x, y].checkFire = true;
+                        if (refUserInterface.comVsCom.isOn || refUserInterface.pVsCom.isOn)
+                        {
+                            ArmyForAI a = new ArmyForAI(layerArmy[x, y], x, y);
+                            listEnemyCanFire.Add(a);
+                        }
                         isFire = true;
                     }
                 }
@@ -399,6 +770,11 @@ public class LayerArmy_ : MonoBehaviour {
                     if (t == Manager_.TypeArmy.blueInfantry || t == Manager_.TypeArmy.blueMech || t == Manager_.TypeArmy.blueTank)
                     {
                         layerArmy[x, y].checkFire = true;
+                        if (refUserInterface.comVsCom.isOn || refUserInterface.pVsCom.isOn)
+                        {
+                            ArmyForAI a = new ArmyForAI(layerArmy[x, y], x, y);
+                            listEnemyCanFire.Add(a);
+                        }
                         isFire = true;
                     }
                 }
@@ -416,6 +792,11 @@ public class LayerArmy_ : MonoBehaviour {
                     if (t == Manager_.TypeArmy.redInfantry || t == Manager_.TypeArmy.redMech || t == Manager_.TypeArmy.redTank)
                     {
                         layerArmy[x, y].checkFire = true;
+                        if (refUserInterface.comVsCom.isOn || refUserInterface.pVsCom.isOn)
+                        {
+                            ArmyForAI a = new ArmyForAI(layerArmy[x, y], x, y);
+                            listEnemyCanFire.Add(a);
+                        }
                         isFire = true;
                     }
                 }
@@ -424,6 +805,11 @@ public class LayerArmy_ : MonoBehaviour {
                     if (t == Manager_.TypeArmy.blueInfantry || t == Manager_.TypeArmy.blueMech || t == Manager_.TypeArmy.blueTank)
                     {
                         layerArmy[x, y].checkFire = true;
+                        if (refUserInterface.comVsCom.isOn || refUserInterface.pVsCom.isOn)
+                        {
+                            ArmyForAI a = new ArmyForAI(layerArmy[x, y], x, y);
+                            listEnemyCanFire.Add(a);
+                        }
                         isFire = true;
                     }
                 }

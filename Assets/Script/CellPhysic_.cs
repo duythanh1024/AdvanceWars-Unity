@@ -1,18 +1,25 @@
 ﻿using UnityEngine;
 public class CellPhysic_ : MonoBehaviour {
+    private UserInterface refUserInterface;
     [SerializeField]
     public int x, y;
     LayerPhycis_ parent;
-	void OnEnable () {
+	void Awake () {
+        refUserInterface = GameObject.Find("CanvasMain").GetComponent<UserInterface>();
         parent = transform.parent.GetComponent<LayerPhycis_>();
 	}
     void OnMouseEnter()
     {
-        parent.OnMouseEnter(x, y);
+        if (!refUserInterface.comVsCom.isOn)
+        {
+            parent.OnMouseEnter(x, y);            
+        }
     }
     void OnMouseDown()
     {
-        parent.ClickOnMap(x, y);
-
+        if (!refUserInterface.comVsCom.isOn)
+        {
+            parent.ClickOnMap(x, y);
+        }
     }
 }

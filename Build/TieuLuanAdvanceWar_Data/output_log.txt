@@ -1,0 +1,43 @@
+Initialize engine version: 5.6.0f3 (497a0f351392)
+GfxDevice: creating device client; threaded=1
+d3d11: D3D_FEATURE_LEVEL_11_1 not-recognized (only 11.0 runtime installed?)
+Direct3D:
+    Version:  Direct3D 11.0 [level 11.0]
+    Renderer: NVIDIA GeForce 820M (ID=0x1140)
+    Vendor:   NVIDIA
+    VRAM:     978 MB
+    Driver:   10.18.13.6881
+Begin MonoManager ReloadAssembly
+Platform assembly: G:\merged_partition_content\Project\Unity\TieuLuan01\Build\New folder\TieuLuanAdvanceWar_Data\Managed\UnityEngine.dll (this message is harmless)
+Loading G:\merged_partition_content\Project\Unity\TieuLuan01\Build\New folder\TieuLuanAdvanceWar_Data\Managed\UnityEngine.dll into Unity Child Domain
+Platform assembly: G:\merged_partition_content\Project\Unity\TieuLuan01\Build\New folder\TieuLuanAdvanceWar_Data\Managed\Assembly-CSharp.dll (this message is harmless)
+Loading G:\merged_partition_content\Project\Unity\TieuLuan01\Build\New folder\TieuLuanAdvanceWar_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
+Platform assembly: G:\merged_partition_content\Project\Unity\TieuLuan01\Build\New folder\TieuLuanAdvanceWar_Data\Managed\UnityEngine.UI.dll (this message is harmless)
+Loading G:\merged_partition_content\Project\Unity\TieuLuan01\Build\New folder\TieuLuanAdvanceWar_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
+Platform assembly: G:\merged_partition_content\Project\Unity\TieuLuan01\Build\New folder\TieuLuanAdvanceWar_Data\Managed\UnityEngine.Networking.dll (this message is harmless)
+Loading G:\merged_partition_content\Project\Unity\TieuLuan01\Build\New folder\TieuLuanAdvanceWar_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
+Platform assembly: G:\merged_partition_content\Project\Unity\TieuLuan01\Build\New folder\TieuLuanAdvanceWar_Data\Managed\UnityEngine.Analytics.dll (this message is harmless)
+Loading G:\merged_partition_content\Project\Unity\TieuLuan01\Build\New folder\TieuLuanAdvanceWar_Data\Managed\UnityEngine.Analytics.dll into Unity Child Domain
+- Completed reload, in  0.036 seconds
+Platform assembly: G:\merged_partition_content\Project\Unity\TieuLuan01\Build\New folder\TieuLuanAdvanceWar_Data\Managed\System.Core.dll (this message is harmless)
+Platform assembly: G:\merged_partition_content\Project\Unity\TieuLuan01\Build\New folder\TieuLuanAdvanceWar_Data\Managed\System.dll (this message is harmless)
+<RI> Initializing input.
+<RI> Input initialized.
+desktop: 1366x768 60Hz; virtual: 1366x768 at 0,0
+<RI> Initialized touch support.
+UnloadTime: 1.863124 ms
+Unloading 6 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 12.439347 ms
+
+Unloading 179 unused Assets to reduce memory usage. Loaded Objects now: 3904.
+Total: 2.295398 ms (FindLiveObjects: 0.301867 ms CreateObjectMapping: 0.149726 ms MarkObjects: 1.691060 ms  DeleteObjects: 0.151537 ms)
+
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 3.848204 ms
+
+Unloading 49 unused Assets to reduce memory usage. Loaded Objects now: 400.
+Total: 0.941825 ms (FindLiveObjects: 0.045280 ms CreateObjectMapping: 0.030186 ms MarkObjects: 0.745612 ms  DeleteObjects: 0.120143 ms)
+
+Setting up 2 worker threads for Enlighten.
+  Thread -> id: 158c -> priority: 1 
+  Thread -> id: 1b88 -> priority: 1 

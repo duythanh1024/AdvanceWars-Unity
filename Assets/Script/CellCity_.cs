@@ -1,15 +1,16 @@
 ﻿using UnityEngine.UI;
 using UnityEngine;
 public class CellCity_ : MonoBehaviour {
-    SpriteRenderer c1, c2;
+    SpriteRenderer sprNumCap1, sprNumCap2, spriMain;
     [SerializeField]
     private int capt;
     private Manager_ manager;
     void Awake()
     {
         manager = GameObject.Find("Manager").GetComponent<Manager_>();
-        c1 = transform.GetChild(0).GetComponent<SpriteRenderer>();
-        c2 = transform.GetChild(1).GetComponent<SpriteRenderer>();
+        sprNumCap1 = transform.GetChild(0).GetComponent<SpriteRenderer>();
+        sprNumCap2 = transform.GetChild(1).GetComponent<SpriteRenderer>();
+        spriMain = transform.GetChild(3).GetComponent<SpriteRenderer>();
     }
     public void IntToSprite()
     {
@@ -49,7 +50,7 @@ public class CellCity_ : MonoBehaviour {
                 spr1 = manager.nine;
                 break;
         }
-        c2.sprite = spr1;
+        sprNumCap2.sprite = spr1;
             switch (b)
             {
                 case 0:
@@ -83,23 +84,50 @@ public class CellCity_ : MonoBehaviour {
                     spr1 = manager.nine;
                     break;
             }
-            c1.sprite = spr1;
+            sprNumCap1.sprite = spr1;
     }
-    public Manager_.TypeArmy Capt(Manager_.OnMove oM)
+    public void CaptHQ(Manager_.OnMove oM)
     {
-        if (capt == 20){
+        if (capt == 20)
+        {//20
             capt = 10;
             IntToSprite();
-            return Manager_.TypeArmy.none;
         }
-        else
+        else//10
+        {
+            if (oM == Manager_.OnMove.Blue)
+            {
+                manager.BlueWin();
+            }
+            else
+            {
+                manager.RedWin();
+            }
+        }
+    }
+    public void CaptCity(Manager_.OnMove oM)
+    {
+        if (capt == 20){//20
+            capt = 10;
+            IntToSprite();
+            spriMain.sprite = manager.sprNoneCity;
+            GetComponent<CellTerrain_>().type = Manager_.TypeArmy.noneCity;
+        }
+        else//10
         {
             capt = 20;
+            IntToSprite();
             if (oM == Manager_.OnMove.Blue)
-                return Manager_.TypeArmy.blueCity;
-        }
-        return Manager_.TypeArmy.redCity;
+            {
+                spriMain.sprite = manager.sprBlueCity;
+                GetComponent<CellTerrain_>().type = Manager_.TypeArmy.blueCity;
 
+            }
+            else
+            {
+                spriMain.sprite = manager.sprRedCity;
+                GetComponent<CellTerrain_>().type = Manager_.TypeArmy.redCity;
+            }
+        }
     }
-    
 }

@@ -12,7 +12,7 @@ public class LayerPath_ : MonoBehaviour {
     private bool iconFire;
     List<List<Vector2>> listListPaths;
     public List<Vector2> listArmyMove;
-	void Awake () {
+	public void MyAwake () {
         refLayerArmy = GameObject.Find("LayerArmy").GetComponent<LayerArmy_>();
         refLayerTerrain = GameObject.Find("LayerTerrain").GetComponent<LayerTerrain_>();
         select = GameObject.Find("IconSelect").GetComponent<Transform>();
@@ -42,7 +42,7 @@ public class LayerPath_ : MonoBehaviour {
     }
     public void SelectFire(bool isFire)
     {
-        select.position = new Vector3(Manager_.currentX, Manager_.currentY);
+        select.position = new Vector3(Manager_.cursorX, Manager_.cursorY);
         if (isFire)
         {
             if (!iconFire)
@@ -57,6 +57,16 @@ public class LayerPath_ : MonoBehaviour {
                     select.transform.GetChild(0).GetComponent<SpriteRenderer>().sprite = iconSelect;
                     iconFire = false;
                 }
+    }
+    public void ClearArea()
+    {
+        for (int c = 0; c < 10; c++)
+        {
+            for (int r = 0; r < 15; r++)
+            {
+                layerPath[r, c].isArea = false;
+            }
+        }
     }
     public void ClearPathAndArea()
     {
@@ -77,7 +87,7 @@ public class LayerPath_ : MonoBehaviour {
             Destroy(transform.GetChild(0).GetChild(i).gameObject);
         }
     }
-    public void ClearAreaCheck()
+    public void ResetNull()
     {
         for (int c = 0; c < 10; c++)
         {
@@ -86,6 +96,10 @@ public class LayerPath_ : MonoBehaviour {
                 layerPath[r, c].isArea = false;
             }
         }
+    }
+    public bool IsCheckHere(int x, int y)
+    {
+        return layerPath[x, y].isArea;
     }
     public void ClearPath()
     {
@@ -105,7 +119,8 @@ public class LayerPath_ : MonoBehaviour {
     public void DrawArea()
     {
         
-        FindArea(Manager_.savedArmy.type, Manager_.savedArmy.move, Manager_.savedX, Manager_.savedY);
+        FindArea(Manager_.savedArmy.type, Manager_.savedArmy.move, Manager_.selectedX, Manager_.selectedY);
+
         for (int c = 0; c < 10; c++)
         {
             for (int r = 0; r < 15; r++)
@@ -117,29 +132,44 @@ public class LayerPath_ : MonoBehaviour {
             }
         }
     }
-    public void SelectArmy()
+    public void SetIconSelectArmy(int x, int y)
     {
-        select.position = new Vector3(Manager_.currentX, Manager_.currentY);
+        select.position = new Vector3(x, y);
     }
-    
+    public List<Position2D> GetListPositionCanMoveTo()
+    {
+        List<Position2D> t = new List<Position2D>();
+        for (int c = 0; c < 10; c++)
+        {
+            for (int r = 0; r < 15; r++)
+            {
+                if (layerPath[r, c].isArea)
+                {
+                    t.Add(new Position2D(r, c));
+                }
+            }
+        }
+        return t;
+    }
     public void DrawPath()
     {
         listListPaths.Clear();
         ClearPath();
-        if (layerPath[Manager_.currentX, Manager_.currentY].isArea)
+        if (layerPath[Manager_.cursorX, Manager_.cursorY].isArea)
         {
-            if (Manager_.savedX == Manager_.currentX && Manager_.savedY == Manager_.currentY)
+            if (Manager_.selectedX == Manager_.cursorX && Manager_.selectedY == Manager_.cursorY)
             {
-                listArmyMove.Add(new Vector2(Manager_.currentX, Manager_.currentY));
+                listArmyMove.Add(new Vector2(Manager_.cursorX, Manager_.cursorY));
+                Instantiate((Resources.Load("CellGreen") as GameObject), transform.GetChild(0)).transform.position = new Vector2(Manager_.cursorX, Manager_.cursorY);
                 return;
             }
             else
             {
-                if (!refLayerArmy.IsNull(Manager_.currentX, Manager_.currentY))
+                if (!refLayerArmy.IsNull(Manager_.cursorX, Manager_.cursorY))
                     return;
             }
             List<Vector2> l = new List<Vector2>();
-            FindPath(Manager_.savedX, Manager_.savedY, Manager_.savedArmy.move, l);
+            FindPath(Manager_.selectedX, Manager_.selectedY, Manager_.savedArmy.move, l);
             int min = 100;//find path min
             for (int i = 0; i < listListPaths.Count; i++)
             {
@@ -182,7 +212,7 @@ public class LayerPath_ : MonoBehaviour {
             path.Add(_path[i]);//add with parent path
         }
         path.Add(new Vector2(_xStart, _yStart));
-        if (_xStart == Manager_.currentX && _yStart == Manager_.currentY)
+        if (_xStart == Manager_.cursorX && _yStart == Manager_.cursorY)
         {
             listListPaths.Add(path);
             return;
@@ -224,7 +254,39 @@ public class LayerPath_ : MonoBehaviour {
         }
 
     }
-
+    public List<Position2D> GetListArea()
+    {
+        List<Position2D> pos2D = new List<Position2D>();
+        for (int c = 0; c < 10; c++)
+        {
+            for (int r = 0; r < 15; r++)
+            {
+                if (layerPath[r, c].isArea && refLayerArmy.IsNull(r, c))
+                {
+                    pos2D.Add(new Position2D(r, c));
+                }
+            }
+        }
+        return pos2D;
+    }
+    public List<Position2D> GetListArea(Manager_.TypeArmy _type, int _move, int _x, int _y)
+    {
+        FindArea(_type, _move,  _x, _y);
+        List<Position2D> pos2D = new List<Position2D>();
+        for (int c = 0; c < 10; c++)
+        {
+            for (int r = 0; r < 15; r++)
+            {
+                if (layerPath[r, c].isArea && refLayerArmy.IsNull(r,c))
+                {
+                    pos2D.Add(new Position2D(r, c));
+                }
+            }
+        }
+        ClearArea();
+        return pos2D;
+    }
+    
     public void FindArea(Manager_.TypeArmy _type, int _move, int _x, int _y)
     {
         if (_move < 0 /*|| mapTerrain[_x, _y].check*/)
@@ -236,7 +298,7 @@ public class LayerPath_ : MonoBehaviour {
             {
                 case Manager_.TypeArmy.redTank:
                 case Manager_.TypeArmy.blueTank:
-                    if (t == Manager_.TypeArmy.grass || t == Manager_.TypeArmy.road || t == Manager_.TypeArmy.bridge || t == Manager_.TypeArmy.city || t == Manager_.TypeArmy.redCity || t == Manager_.TypeArmy.blueCity || t == Manager_.TypeArmy.blueHeadquater || t == Manager_.TypeArmy.redHeadquater)
+                    if (t == Manager_.TypeArmy.grass || t == Manager_.TypeArmy.road || t == Manager_.TypeArmy.bridge || t == Manager_.TypeArmy.noneCity || t == Manager_.TypeArmy.redCity || t == Manager_.TypeArmy.blueCity || t == Manager_.TypeArmy.blueHeadquater || t == Manager_.TypeArmy.redHeadquater)
                     {
                         layerPath[_x, _y].isArea = true;
                         if (_x + 1 <= 14)

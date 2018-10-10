@@ -26,6 +26,8 @@ public class CellArmy_ : MonoBehaviour {
             c2 = transform.GetChild(1).GetComponent<SpriteRenderer>();
         }
         UpdateHp(10, true);
+        
+
     }
     /// <summary>
     /// return false if die (hp = 0)
@@ -38,7 +40,7 @@ public class CellArmy_ : MonoBehaviour {
             hp = newHp;
         else
             hp = Mathf.Min(newHp, hp);
-        if (hp > 10)
+        if (hp > 10)    
             hp = 10;
         if (hp <= 0)
         {
@@ -91,11 +93,13 @@ public class CellArmy_ : MonoBehaviour {
                         break;
                 }
                 break;
-        }
-        return dame;
+        }   
+        return dame*hp/10;
     }
-    public void Capt()
+  
+    public void Capt(float sp)
     {
+        anim["Capt"].speed = sp;
         anim.Play();
     }
     public void Moved()

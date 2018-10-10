@@ -2,7 +2,7 @@
 public class LayerTerrain_ : MonoBehaviour {
     public CellTerrain_[,] layerTerrain;
     private Manager_ manager;
-    void Awake()
+    public void MyAwake()
     {
         manager = GameObject.Find("Manager").GetComponent<Manager_>();
     }
@@ -27,14 +27,14 @@ public class LayerTerrain_ : MonoBehaviour {
         Manager_.TypeArmy t = layerTerrain[Manager_.newX, Manager_.newY].type;
         if (oM == Manager_.OnMove.Red)
         {
-            if (t == Manager_.TypeArmy.city || t == Manager_.TypeArmy.blueCity || t == Manager_.TypeArmy.blueHeadquater)
+            if (t == Manager_.TypeArmy.noneCity || t == Manager_.TypeArmy.blueCity || t == Manager_.TypeArmy.blueHeadquater)
             {
                 return true;
             }
         }
         else//blue
         {
-            if (t == Manager_.TypeArmy.city || t == Manager_.TypeArmy.redCity || t == Manager_.TypeArmy.redHeadquater)
+            if (t == Manager_.TypeArmy.noneCity || t == Manager_.TypeArmy.redCity || t == Manager_.TypeArmy.redHeadquater)
             {
                 return true;
             }
@@ -46,7 +46,7 @@ public class LayerTerrain_ : MonoBehaviour {
         return layerTerrain[x, y].type;
     }
 	public void Capt (Manager_.OnMove oM) {
-        Manager_.TypeArmy t = layerTerrain[Manager_.newX, Manager_.newY].GetComponent<CellCity_>().Capt(oM);
+        /*Manager_.TypeArmy t = layerTerrain[Manager_.newX, Manager_.newY].GetComponent<CellCity_>().Capt(oM);
         if (t == Manager_.TypeArmy.redCity)
         {
             Destroy(layerTerrain[Manager_.newX, Manager_.newY].gameObject);
@@ -61,6 +61,12 @@ public class LayerTerrain_ : MonoBehaviour {
                 layerTerrain[Manager_.newX, Manager_.newY] = Instantiate(Resources.Load("BlueCity") as GameObject, transform).GetComponent<CellTerrain_>();
                 layerTerrain[Manager_.newX, Manager_.newY].transform.position = new Vector3(Manager_.newX, Manager_.newY);
             }
-        }
+        }*/
+        Manager_.TypeArmy t = layerTerrain[Manager_.newX, Manager_.newY].GetComponent<CellTerrain_>().type;
+        if (t == Manager_.TypeArmy.redHeadquater || t == Manager_.TypeArmy.blueHeadquater)
+            layerTerrain[Manager_.newX, Manager_.newY].GetComponent<CellCity_>().CaptHQ(oM);
+        else
+            layerTerrain[Manager_.newX, Manager_.newY].GetComponent<CellCity_>().CaptCity(oM);
+        
 	}
 }

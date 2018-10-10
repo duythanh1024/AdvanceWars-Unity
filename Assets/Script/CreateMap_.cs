@@ -11,7 +11,7 @@ public class CreateMap_ : MonoBehaviour {
     LayerTerrain_ refLayerTerrain;
    
     public CellTerrain_ cel;
-    void Start()
+    public void StartLoadPrefabs()
     {
         refLayerArmy = GameObject.Find("LayerArmy").GetComponent<LayerArmy_>();
         listArmy = refLayerArmy.transform;
@@ -38,7 +38,7 @@ public class CreateMap_ : MonoBehaviour {
         StreamReader reader = null;
         try
         {
-            reader = new StreamReader(Application.dataPath + @"\" + fileName);
+            reader = new StreamReader(Application.streamingAssetsPath + @"\" + fileName);
         }
         catch (Exception)
         {
